@@ -18,6 +18,23 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+      @NotNull
+    private String name;
+
+    @NotNull
+    @Email
+    @Column(unique = true)
+    private String email;
+
+    @NotNull
+    private String address;
+
+    @NotNull
+    private LocalDate dateOfBirth;
+
+    @NotNull
+    private LocalDate registeredDate;
+
     public void setId(UUID id) {
         this.id = id;
     }
@@ -65,22 +82,5 @@ public class Patient {
     public LocalDate getRegisteredDate() {
         return registeredDate;
     }
-
-    @NotNull
-    private String name;
-
-    @NotNull
-    @Email
-    @Column(unique = true)
-    private String email;
-
-    @NotNull
-    private String address;
-
-    @NotNull
-    private LocalDate dateOfBirth;
-
-    @NotNull
-    private LocalDate registeredDate;
 
 }
