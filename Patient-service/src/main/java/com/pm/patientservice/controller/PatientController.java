@@ -20,13 +20,17 @@ import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.dto.validator.CreatePatientValidationGroup;
 import com.pm.patientservice.service.PatientService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 
 
 @RestController
 @RequestMapping("/patients") //http://localhost:4000/patients
+@Tag(name = "Patient", description = "API for managing patients")
 public class PatientController {
+
     private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
@@ -34,18 +38,21 @@ public class PatientController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all patients")
     public ResponseEntity<List<PatientResponseDTO>> getPatients() {
         List<PatientResponseDTO> patients = patientService.getPatients();
         return ResponseEntity.ok().body(patients);
     }
 
     @PostMapping
+      @Operation(summary = "Create a new patient")
       public ResponseEntity<PatientResponseDTO> createPatient (@Validated({Default.class, CreatePatientValidationGroup.class}) @RequestBody PatientRequestDTO patientRequestDTO) {
           PatientResponseDTO patientResponseDTO = patientService.createPatient(patientRequestDTO);
           return ResponseEntity.ok().body(patientResponseDTO);
       }
 
       @PutMapping("/{id}")
+      @Operation(summary = "Update a patient")
       public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id, @RequestBody @Valid PatientRequestDTO patientRequestDTO) {
 
           PatientResponseDTO patientResponseDTO = patientService.updatePatient(id, patientRequestDTO);
@@ -53,6 +60,7 @@ public class PatientController {
       }
 
       @DeleteMapping("/{id}")
+      @Operation(summary = "Delete a patient")
       public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
           patientService.deletePatient(id);
           return ResponseEntity.noContent().build();
