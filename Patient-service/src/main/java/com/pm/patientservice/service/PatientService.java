@@ -22,12 +22,14 @@ public class PatientService {
         List<Patient> patients = patientRepository.findAll();
         List<PatientResponseDTO> patientResponseDTOs = 
             patients.stream().map(PatientMapper::toDTO).toList();
+            
         return patientResponseDTOs;
     }
 
     public PatientResponseDTO createPatient(PatientRequestDTO PatientRequestDTO) {
         Patient newPatient = patientRepository.save(
             PatientMapper.toModel(PatientRequestDTO));
+
         return PatientMapper.toDTO(newPatient);
     }
 }
