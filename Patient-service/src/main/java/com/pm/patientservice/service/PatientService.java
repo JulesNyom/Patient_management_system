@@ -1,11 +1,15 @@
 package com.pm.patientservice.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.pm.patientservice.dto.PatientRequestDTO;
 import com.pm.patientservice.dto.PatientResponseDTO;
+import com.pm.patientservice.exception.EmailAlreadyExistsException;
+import com.pm.patientservice.exception.PatientNotFoundException;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
@@ -22,14 +26,29 @@ public class PatientService {
         List<Patient> patients = patientRepository.findAll();
         List<PatientResponseDTO> patientResponseDTOs = 
             patients.stream().map(PatientMapper::toDTO).toList();
-            
+
         return patientResponseDTOs;
     }
 
     public PatientResponseDTO createPatient(PatientRequestDTO PatientRequestDTO) {
+        if(patientRepository.existsByEmail(PatientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException("A patient with email " + PatientRequestDTO.getEmail() + " already exists");
+        }
+        
         Patient newPatient = patientRepository.save(
             PatientMapper.toModel(PatientRequestDTO));
 
         return PatientMapper.toDTO(newPatient);
+    }
+
+    public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException("Patient not found with ID : ", id));
+        patient.setName(patientRequestDTO.getName());
+        patient.setEmail(patientRequestDTO.getEmail());
+        patient.setAddress(patientRequestDTO.getAddress());
+        patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
+        patient.setRegisteredDate(LocalDate.parse(patientRequestDTO.getRegisteredDate()));
+        Patient updatedPatient = patientRepository.save(patient);
+        return PatientMapper.toDTO(updatedPatient);
     }
 }
